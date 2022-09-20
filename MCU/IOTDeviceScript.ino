@@ -47,7 +47,7 @@ const char pass[] = "gerzonypaula"; // TODO cambiar por la contraseña de la red
 
 //Conexión a Mosquitto
 #define USER "ironman" // TODO Reemplace UsuarioMQTT por un usuario (no administrador) que haya creado en la configuración del bróker de MQTT.
-const char MQTT_HOST[] = "35.173.249.157"; // TODO Reemplace ip.maquina.mqtt por la IP del bróker MQTT que usted desplegó. Ej: 192.168.0.1
+const char MQTT_HOST[] = "3.80.119.82"; // TODO Reemplace ip.maquina.mqtt por la IP del bróker MQTT que usted desplegó. Ej: 192.168.0.1
 const int MQTT_PORT = 8082;
 const char MQTT_USER[] = USER;
 //Contraseña de MQTT
@@ -260,8 +260,13 @@ void displayConnecting(String ssid) {
  */
 String checkAlert() {
   String message = "OK";
-  
   if (alert.length() != 0) {
+    if (alert == "NEW ALERT humedad 50%") {
+      Serial.println("Advertencia presente: ");
+      digitalWrite(ACTUADOR, HIGH);
+    } else {
+      digitalWrite(ACTUADOR, LOW);
+    }
     message = alert;
     if ((millis() - alertTime) >= ALERT_DURATION * 1000 ) {
       alert = "";
@@ -442,7 +447,7 @@ void setup() {
   setTime();
 
   configureMQTT();
-  //Configuracion de D7 como señal digital de salida
+  //Configuracion de D0 como señal digital de salida
   pinMode(ACTUADOR, OUTPUT);
 }
 
@@ -453,15 +458,6 @@ void loop() {
   String message = checkAlert();
 
   measure();
-
-  //Mientras que se reciba un mensaje de alarma 
-  if (message.indexOf("NEW ALERT humedad 50%") > 0) {
-    Serial.println("Advertencia presente: ");
-    Serial.println(message);
-    digitalWrite(ACTUADOR, HIGH);
-  } else {
-    digitalWrite(ACTUADOR, LOW);
-  }
   
   display.clearDisplay();
   display.setCursor(0,0);

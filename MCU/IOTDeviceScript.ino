@@ -22,7 +22,8 @@
 #define MEASURE_INTERVAL 2
 // Duración aproximada en la pantalla de las alertas que se reciban
 #define ALERT_DURATION 60
-
+// Definicion señal led para anunciar llegada de alarma
+#define ACTUADOR D7
 
 // Declaraciones
 
@@ -283,7 +284,7 @@ void receivedCallback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) {
     data += String((char)payload[i]);
   }
-  Serial.print(data);
+  Serial.println(data);
   if (data.indexOf("ALERT") >= 0) {
     alert = data;
   }
@@ -440,7 +441,9 @@ void setup() {
 
   setTime();
 
-  configureMQTT(); 
+  configureMQTT();
+  //Configuracion de D7 como señal digital de salida
+  pinMode(ACTUADOR, OUTPUT);
 }
 
 void loop() {
@@ -450,6 +453,15 @@ void loop() {
   String message = checkAlert();
 
   measure();
+
+  //Mientras que se reciba un mensaje de alarma 
+  if (message.indexOf("NEW ALERT humedad 50%") > 0) {
+    Serial.println("Advertencia presente: ");
+    Serial.println(message);
+    digitalWrite(ACTUADOR, HIGH);
+  } else {
+    digitalWrite(ACTUADOR, LOW);
+  }
   
   display.clearDisplay();
   display.setCursor(0,0);

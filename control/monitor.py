@@ -46,11 +46,11 @@ def analyze_data():
         city = item['station__location__city__name']
         user = item['station__user__username']
 
-        if item["check_value"] > 50.0 & item["measurement__name"] == "humedad":
-            alert = True
+        if item["check_value"] > 50.0 and item["measurement__name"] == "humedad":
+            new_alert = True
 
         if item["check_value"] > max_value or item["check_value"] < min_value:
-            new_alert = True
+            alert = True
 
         if alert:
             message = "ALERT {} {} {}".format(variable, min_value, max_value)
